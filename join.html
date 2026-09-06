@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Join Our Community — Tech-o-nicks Program</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="config.js"></script>
+  <style>
+    .join-hero { background: linear-gradient(135deg, #1E7E34 0%, #34A853 100%); padding: 48px 24px 40px; text-align: center; }
+    .join-hero h1 { font-family: 'Nunito', sans-serif; font-size: 2rem; font-weight: 800; color: white; margin-bottom: 10px; }
+    .join-hero p { color: rgba(255,255,255,.88); font-size: 1.05rem; max-width: 520px; margin: 0 auto; }
+    .join-wrap { max-width: 680px; margin: 40px auto 60px; padding: 0 16px; }
+    .join-card { background: white; border-radius: var(--radius-lg); border: 1px solid var(--border); padding: 36px 32px; }
+    .section-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: #34A853; margin-bottom: 14px; margin-top: 28px; }
+    .section-label:first-child { margin-top: 0; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media (max-width: 560px) { .form-row { grid-template-columns: 1fr; } .join-card { padding: 24px 18px; } }
+    .checkbox-group { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+    .checkbox-pill input { display: none; }
+    .checkbox-pill label { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 20px; border: 1.5px solid var(--border); font-size: 0.85rem; cursor: pointer; transition: all .15s; user-select: none; background: white; color: var(--text-secondary); }
+    .checkbox-pill input:checked + label { background: #E6F4EA; border-color: #34A853; color: #1E7E34; font-weight: 600; }
+    .checkbox-pill label:hover { border-color: #34A853; color: #1E7E34; }
+    .btn-green { background: #34A853; color: white; border: none; }
+    .btn-green:hover { background: #2d9147; }
+    .success-box { text-align: center; padding: 48px 24px; }
+    .success-icon { font-size: 3.5rem; margin-bottom: 16px; }
+    .success-box h2 { font-family: 'Nunito', sans-serif; font-size: 1.6rem; font-weight: 800; margin-bottom: 8px; color: var(--text-primary); }
+    .success-box p { color: var(--text-secondary); margin-bottom: 24px; }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-dots">
+        <span class="dot-b"></span><span class="dot-r"></span>
+        <span class="dot-y"></span><span class="dot-g"></span>
+      </div>
+      <span class="nav-logo-text"><span>Tech-o-nicks</span></span>
+    </a>
+    <button class="nav-toggle" onclick="this.classList.toggle('active'); this.closest('.nav-inner').querySelector('.nav-links').classList.toggle('open')" aria-label="Toggle menu">
+      <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+    </button>
+    <div class="nav-links">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="sessions.html" class="nav-link">Sessions</a>
+      <a href="join.html" class="nav-link active">Join Community</a>
+      <a href="login.html" class="nav-link">Login</a>
+      <a href="admin.html" class="nav-link">Admin</a>
+    </div>
+  </div>
+</nav>
+
+<div class="join-hero">
+  <h1>🤝 Join Our Community</h1>
+  <p>Become a member of the Tech-o-nicks community. Stay updated on sessions, events, and opportunities.</p>
+</div>
+
+<div class="join-wrap">
+  <div class="join-card" id="form-card">
+
+    <div id="form-area">
+      <div id="join-alert"></div>
+
+      <div class="section-label">Personal Info</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Full Name <span style="color:red">*</span></label>
+          <input type="text" class="form-control" id="j-name" placeholder="Your full name">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phone Number <span style="color:red">*</span></label>
+          <input type="tel" class="form-control" id="j-phone" placeholder="+91 XXXXX XXXXX">
+        </div>
+      </div>
+      <div class="form-group">
+          <label class="form-label">Email Address <span style="color:red">*</span></label>
+          <input type="email" class="form-control" id="j-email" placeholder="you@example.com">
+        </div>
+
+      <div class="section-label">Academic Info</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">College / Institution <span style="color:red">*</span></label>
+          <input type="text" class="form-control" id="j-college" placeholder="Your college name">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Branch / Department <span style="color:red">*</span></label>
+          <input type="text" class="form-control" id="j-branch" placeholder="e.g. Computer Science">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Roll Number <span style="color:red">*</span></label>
+          <input type="text" class="form-control" id="j-roll" placeholder="e.g. 21CS1234">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Year of Study <span style="color:red">*</span></label>
+          <select class="form-control" id="j-year">
+            <option value="">Select year</option>
+            <option>1st Year</option>
+            <option>2nd Year</option>
+            <option>3rd Year</option>
+            <option>4th Year</option>
+            <option>Postgraduate</option>
+            <option>Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Experience Level <span style="color:red">*</span></label>
+        <select class="form-control" id="j-experience">
+          <option value="">Select level</option>
+          <option value="beginner">Beginner</option>
+          <option value="intermediate">Intermediate</option>
+          <option value="advanced">Advanced</option>
+        </select>
+      </div>
+
+      <div class="section-label">Account</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Password <span style="color:red">*</span></label>
+          <input type="password" class="form-control" id="j-password" placeholder="At least 6 characters">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Confirm Password <span style="color:red">*</span></label>
+          <input type="password" class="form-control" id="j-password2" placeholder="Re-enter password">
+        </div>
+      </div>
+      <div class="form-hint" style="margin-top:-8px;margin-bottom:4px;">You'll use this email &amp; password to log in later and register for sessions in one click.</div>
+
+      <div class="section-label">Interests</div>
+      <div class="form-group">
+        <label class="form-label">What are you interested in? (select all that apply)</label>
+        <div class="checkbox-group">
+          <div class="checkbox-pill"><input type="checkbox" id="i-cloud" value="Google Cloud"><label for="i-cloud">☁️ Google Cloud</label></div>
+          <div class="checkbox-pill"><input type="checkbox" id="i-ai" value="AI / ML"><label for="i-ai">🤖 AI / ML</label></div>
+          <div class="checkbox-pill"><input type="checkbox" id="i-android" value="Android"><label for="i-android">📱 Android</label></div>
+          <div class="checkbox-pill"><input type="checkbox" id="i-web" value="Web Dev"><label for="i-web">🌐 Web Dev</label></div>
+          <div class="checkbox-pill"><input type="checkbox" id="i-firebase" value="Firebase"><label for="i-firebase">🔥 Database</label></div>
+          <div class="checkbox-pill"><input type="checkbox" id="i-gemini" value="Gemini API"><label for="i-gemini">✨Arduino </label></div>
+          <div class="checkbox-pill"><input type="checkbox" id="i-devops" value="DevOps"><label for="i-devops">⚙️ Cybersecurity</label></div>
+          <div class="checkbox-pill"><input type="checkbox" id="i-career" value="Career Growth"><label for="i-career">🚀 Career Growth</label></div>
+          <div class="checkbox-pill"><input type="checkbox" id="i-career" value="Career Growth"><label for="i-career">Others</label></div>
+        </div>
+      </div>
+
+      <div class="section-label">About You</div>
+      <div class="form-group">
+        <label class="form-label">Why do you want to join? <span style="color:var(--text-muted);font-weight:400;">(optional)</span></label>
+        <textarea class="form-control" id="j-why" rows="3" placeholder="Tell us a bit about yourself and what you hope to get from the community..."></textarea>
+      </div>
+
+      <div style="margin-top:24px;">
+        <button class="btn btn-green" id="join-btn" onclick="submitJoin()" style="width:100%;padding:13px;font-size:1rem;">
+          🤝 Join the Community
+        </button>
+      </div>
+    </div>
+
+    <div id="success-area" class="success-box" style="display:none;">
+      <div class="success-icon">🎉</div>
+      <h2>Welcome to the Community!</h2>
+      <p>You've successfully joined the Tech-o-nicks community. We'll keep you posted on upcoming sessions and events.</p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <a href="sessions.html" class="btn btn-primary">Browse Sessions</a>
+        <a href="login.html" class="btn btn-secondary">Log In</a>
+        <a href="index.html" class="btn btn-secondary">Back to Home</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <p>Tech-o-nicks Program — Built By TeamX · </a></p>
+</footer>
+
+<script>
+async function submitJoin() {
+  const btn = document.getElementById('join-btn');
+  const alertBox = document.getElementById('join-alert');
+  alertBox.innerHTML = '';
+
+  const interests = [...document.querySelectorAll('.checkbox-pill input:checked')].map(c => c.value);
+
+  const password  = document.getElementById('j-password').value;
+  const password2 = document.getElementById('j-password2').value;
+
+  const body = {
+    fullName:           document.getElementById('j-name').value.trim(),
+    email:              document.getElementById('j-email').value.trim(),
+    phone:              document.getElementById('j-phone').value.trim(),
+    college:            document.getElementById('j-college').value.trim(),
+    branch:             document.getElementById('j-branch').value.trim(),
+    rollNumber:         document.getElementById('j-roll').value.trim(),
+    year:               document.getElementById('j-year').value,
+    experience:         document.getElementById('j-experience').value,
+    password,
+    interests,
+    whyJoin:            document.getElementById('j-why').value.trim()
+  };
+
+  if (!body.fullName || !body.email || !body.phone || !body.college || !body.branch || !body.rollNumber || !body.year || !body.experience) {
+    alertBox.innerHTML = '<div class="alert alert-error">⚠️ Please fill in all required fields.</div>';
+    return;
+  }
+  if (!password || password.length < 6) {
+    alertBox.innerHTML = '<div class="alert alert-error">⚠️ Password must be at least 6 characters.</div>';
+    return;
+  }
+  if (password !== password2) {
+    alertBox.innerHTML = '<div class="alert alert-error">⚠️ Passwords do not match.</div>';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Joining...';
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/community/join`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Something went wrong');
+    document.getElementById('form-area').style.display = 'none';
+    document.getElementById('success-area').style.display = 'block';
+  } catch (err) {
+    alertBox.innerHTML = `<div class="alert alert-error">⚠️ ${err.message}</div>`;
+    btn.disabled = false;
+    btn.textContent = '🤝 Join the Community';
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tech-o-nicks Program</title>
+  <link rel="icon" type="image/png" href="tech-o-nicks.png">
+  <link rel="stylesheet" href="style.css">
+  <script src="config.js"></script>
+  <style>
+    .features { padding: 60px 0; }
+    .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+    .feature-card { padding: 28px; border-radius: var(--radius-lg); border: 1px solid var(--border); background: white; transition: all .2s; }
+    .feature-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+    .feature-icon { width: 48px; height: 48px; border-radius: 12px; display: grid; place-items: center; font-size: 1.4rem; margin-bottom: 16px; }
+    .feature-card h3 { font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 1rem; margin-bottom: 8px; }
+    .feature-card p { font-size: 0.875rem; color: var(--text-secondary); line-height: 1.6; }
+    .upcoming-section { padding: 20px 0 60px; }
+    .sessions-preview { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+    .cta-section { background: linear-gradient(135deg, #4285F4 0%, #1A73E8 100%); text-align: center; display: flex; align-items: center; justify-content: space-evenly; padding: 60px 0; color: white;  font-weight: bold; font-size: 1.5rem; flex-wrap: wrap ; }
+    .admin-pic{height: 70vh; width: auto;}
+    .admin-name{display: flex; justify-content: center;}
+    .admin-role{font-size: 1rem; color: rgb(202, 201, 201);}
+    .btn-white { background: white; color: var(--google-blue); }
+    .btn-white:hover { background: var(--blue-50); }
+    .btn-outline-white { background: transparent; color: white; border: 2px solid rgba(255,255,255,.5); }
+    .btn-outline-white:hover { background: rgba(255,255,255,.1); border-color: white; }
+    .whatsapp{display: flex; align-items: center; flex-direction: column; font-size: 1rem; color: green; padding: 40px 0;}
+    .whatsapp a img{height: 50px;}
+    .linkedin a img{height: 30px;}
+
+    #certificate-cont {
+  position: relative;
+  overflow: hidden;
+}
+
+#certificate {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  transform: translateY(-110%);
+  transition: transform 0.4s cubic-bezier(0.34, 1.2, 0.64, 1);
+  z-index: 10;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+  border: 1px solid var(--border);
+}
+
+#certificate-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+#certificate-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+#certificate-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.3rem;
+  line-height: 1;
+  color: var(--text-secondary);
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  transition: background 0.15s;
+}
+
+#certificate-close:hover {
+  background: var(--surface-3);
+}
+
+#certificate-body {
+  width: 100%;
+}
+#certificate-body img{
+  width: 100%;
+}
+
+#certificate-cert-title {
+  font-size: 0.7rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+#certificate-cert-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  font-family: 'Nunito', sans-serif;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+#certificate-cert-sub {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+}
+
+#certificate-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: white;
+  border-radius: 20px;
+  padding: 5px 14px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--google-blue);
+  border: 1px solid var(--blue-100);
+}
+
+.cert-dots {
+  display: flex;
+  gap: 3px;
+}
+
+.cert-dots span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: block;
+}
+
+#certificate-text {
+  position: relative;
+}
+
+#certificate-btn-cont {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 14px;
+}
+
+#certificate-btn {
+  padding: 6px 14px;
+  border-radius: 20px;
+  background: var(--google-blue);
+  color: white;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
+}
+
+#certificate-btn:hover {
+  background: var(--blue-600);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+    @media only screen and (max-width: 768px){
+      .cta-section { flex-direction: column; }
+      .admin-pic { width: 50vw; height: auto; }
+    }
+
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-dots">
+        <img src="Tech-o-nicks.webp" alt="Tech-o-nicks Logo" style="width: 30px; height: 30px; background: black">
+      </div>
+      <span class="nav-logo-text"><span>Tech-o-nicks</span></span>
+    </a>
+    <button class="nav-toggle" onclick="this.classList.toggle('active'); this.closest('.nav-inner').querySelector('.nav-links').classList.toggle('open')" aria-label="Toggle menu">
+      <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+    </button>
+    <div class="nav-links">
+      <a href="index.html" class="nav-link active">Home</a>
+      <a href="sessions.html" class="nav-link">Sessions</a>
+      <a href="join.html" class="nav-link">Join Community</a>
+      <a href="login.html" class="nav-link">Login</a>
+      <a href="admin.html" class="nav-link">Admin</a>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-badge">
+    <span></span> Powered by CGEC
+  </div>
+  <h1>
+    <span class="tech-title">TECH O NICKS</span> <br>
+   Program
+  </h1>
+  <p>Learn. Build. Explore. Grow.
+      Join hands-on sessions led by experienced seniors from TECH O NICKS, CGEC, and discover skills across technology, engineering, programming, electronics, web development, and more.
+</p></p>
+  <div class="hero-actions">
+    <a href="https://techonicks.vercel.app/" class="btn btn-secondary" style="background:#E6F4EA;color:#1E7E34;border-color:#A8D5B5;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Tech-O-Nicks
+    </a>
+    
+    <a href="sessions.html" class="btn btn-primary">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Browse Sessions
+    </a>
+    <a href="join.html" class="btn btn-secondary" style="background:#E6F4EA;color:#1E7E34;border-color:#A8D5B5;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Join Community
+    </a>
+    
+  </div>
+</section>
+
+<div class="container">
+  <div class="stats-row" style="margin-top:32px;">
+    <div class="stat-card">
+      <div class="stat-icon blue">🎯</div>
+      <div><div class="stat-value" id="stat-sessions">—</div><div class="stat-label">Total Sessions</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon green">✅</div>
+      <div><div class="stat-value" id="stat-active">—</div><div class="stat-label">Active Sessions</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon yellow">👥</div>
+      <div><div class="stat-value" id="stat-regs">—</div><div class="stat-label">Community</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon red">🚀</div>
+      <div><div class="stat-value">Free</div><div class="stat-label">Always Free</div></div>
+    </div>
+  </div>
+
+  <div class="features">
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#E8F0FE;">🧠</div>
+        <h3>Expert-Led Sessions</h3>
+        <p>Learn from experienced seniors through hands-on sessions covering Modern Web Technologies, programming, electronics, engineering, and more.</p>
+      </div>
+      <div class="feature-card" id="certificate-cont">
+
+  <div id="certificate">
+    <div id="certificate-header">
+      <span id="certificate-label">Your Certificate</span>
+      <button id="certificate-close">&times;</button>
+    </div>
+    <div id="certificate-body">
+      <img src="certificate.jpeg" alt="Your Certificate">
+    </div>
+  </div>
+
+  <div id="certificate-text">
+    <div class="feature-icon" style="background:#E6F4EA;">📜</div>
+    <h3>Earn Recognition and Certificates</h3>
+    <p>Attend sessions and earn certificates that recognize your learning journey and contribute towards your MAR points.
+</p>
+    <div id="certificate-btn-cont">
+      <div id="certificate-btn">view &rarr;</div>
+    </div>
+  </div>
+
+</div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#FEF7E0;">🤝</div>
+        <h3>Build Network</h3>
+        <p>Connect with fellow students, seniors, and tech enthusiasts who share a passion for learning, innovation, and technology.
+</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#FCE8E6;">⚡</div>
+        <h3>Hands-On Learning</h3>
+        <p>Interactive workshops with real projects using Google Cloud, Gemini API, Android, and more.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="upcoming-section">
+    <div class="section-title">
+      Upcoming Sessions
+      <a href="sessions.html" class="btn btn-secondary btn-sm">View All →</a>
+    </div>
+    <div class="sessions-preview" id="preview-sessions">
+      <div class="spinner"></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>Tech-o-nicks Program — Built By TeamX</p>
+</footer>
+
+
+
+<script>
+// Combines s.date (ISO string) and s.time ("HH:MM") into a proper Date object
+function getSessionDateTime(s) {
+  const datePart = s.date.substring(0, 10); // "2026-05-31"
+  return new Date(`${datePart}T${s.time}:00`); // "2026-05-31T17:00:00"
+}
+
+fetch(`${API_BASE_URL}/api/sessions`)
+  .then(r => r.json())
+  .then(sessions => {
+    document.getElementById('stat-sessions').textContent = sessions.length;
+    const now = new Date();
+    document.getElementById('stat-active').textContent = sessions.filter(s => getSessionDateTime(s) >= now).length;
+    const container = document.getElementById('preview-sessions');
+    const upcoming = sessions.filter(s => getSessionDateTime(s) >= now).slice(0, 3);
+    if (!upcoming.length) {
+      container.innerHTML = `<div class="empty" style="grid-column:1/-1"><div class="empty-icon">📅</div><h3>No sessions yet</h3><p>Check back soon.</p></div>`;
+      return;
+    }
+    container.innerHTML = upcoming.map(s => renderCard(s)).join('');
+  }).catch(() => {
+    document.getElementById('preview-sessions').innerHTML = `<p style="color:var(--text-muted);text-align:center;">Could not load sessions.</p>`;
+  });
+
+fetch(`${API_BASE_URL}/api/stats/public`)
+  .then(r => r.json())
+  .then(d => {
+    if (d.totalCommunityMembers !== undefined)
+      document.getElementById('stat-regs').textContent =
+        d.totalCommunityMembers;
+  })
+  .catch(() => {
+    document.getElementById('stat-regs').textContent = '—';
+  });
+
+function renderCard(s) {
+  const date = new Date(s.date).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
+  const tags = (s.tags||[]).map(t => `<span class="tag">${t}</span>`).join('');
+  return `
+    <div class="session-card">
+      ${s.image ? `<img class="session-card-image" src="${s.image}" alt="${s.title}">` : ''}
+      <div class="session-card-header">
+        <div class="session-tags">${tags || '<span class="tag">General</span>'}</div>
+        <h3>${s.title}</h3>
+        <p>${s.description.substring(0,100)}${s.description.length > 100 ? '...' : ''}</p>
+      </div>
+      <div class="session-card-body">
+        <div class="session-meta">
+          <div class="meta-item"><span class="meta-icon">👤</span>${s.speaker}</div>
+          <div class="meta-item"><span class="meta-icon">📅</span>${date} at ${s.time}</div>
+          <div class="meta-item"><span class="meta-icon">📍</span>${s.venue}</div>
+        </div>
+      </div>
+      <div class="session-card-footer">
+        <div>
+          <div class="capacity-bar"><div class="capacity-fill" style="width:${Math.min(100,(s.registrationCount||0)/s.maxCapacity*100)}%"></div></div>
+          <div class="capacity-text">${s.registrationCount||0} / ${s.maxCapacity} registered</div>
+        </div>
+        ${getSessionDateTime(s) < new Date()
+          ? `<span style="font-size:.8rem;color:var(--text-muted)">Session ended</span>`
+          : (s.registrationCount||0) >= s.maxCapacity
+            ? `<span class="btn btn-sm" style="background:var(--surface-3);color:var(--text-muted);cursor:default;">Full</span>`
+            : `<a href="register.html?session=${s._id}" class="btn btn-primary btn-sm">Register</a>`}
+      </div>
+    </div>`;
+}
+
+const certOverlay = document.getElementById('certificate');
+const certCard = document.getElementById('certificate-cont');
+
+document.getElementById('certificate-btn').addEventListener('click', () => {
+  certCard.style.minHeight = certCard.offsetHeight + 'px';
+  certOverlay.style.transform = 'translateY(0)';
+});
+
+document.getElementById('certificate-close').addEventListener('click', () => {
+  certOverlay.style.transform = 'translateY(-110%)';
+});
+</script>
+</body>
+</html>

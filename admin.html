@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin – Tech-o-nicks Program</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="config.js"></script>
+  <style>
+    .login-wrap { max-width: 400px; margin: 80px auto; padding: 0 24px; }
+    .login-card { background: white; border: 1px solid var(--border); border-radius: var(--radius-xl); padding: 36px; box-shadow: var(--shadow-md); text-align: center; }
+    .login-logo .nav-logo-dots { width: 36px; gap: 5px; margin: 0 auto 12px; }
+    .login-logo .nav-logo-dots span { width: 14px; height: 14px; }
+    .login-card h2 { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1.4rem; margin-bottom: 6px; }
+    .login-card > p { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 24px; }
+    #admin-app { display: none; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .actions-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-dots">
+        <span class="dot-b"></span><span class="dot-r"></span>
+        <span class="dot-y"></span><span class="dot-g"></span>
+      </div>
+      <span class="nav-logo-text"><span>Tech-o-nicks</span></span>
+    </a>
+    <button class="nav-toggle" onclick="this.classList.toggle('active'); this.closest('.nav-inner').querySelector('.nav-links').classList.toggle('open')" aria-label="Toggle menu">
+      <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+    </button>
+    <div class="nav-links" id="admin-nav">
+      <span style="font-size:.85rem;color:var(--text-secondary);padding:8px 12px;">Admin</span>
+      <button class="btn btn-secondary btn-sm" onclick="logout()">Logout</button>
+    </div>
+  </div>
+</nav>
+
+<!-- LOGIN -->
+<div class="login-wrap" id="login-screen">
+  <div class="login-card">
+    <div class="login-logo" style="margin-bottom:20px;">
+      <div class="nav-logo-dots">
+        <span class="dot-b"></span><span class="dot-r"></span>
+        <span class="dot-y"></span><span class="dot-g"></span>
+      </div>
+      <span style="font-family:'Nunito',sans-serif;font-weight:800;font-size:1rem;">Tech-o-nicks Admin</span>
+    </div>
+    <h2>Admin Portal</h2>
+    <p>Enter your password to access the dashboard.</p>
+    <div id="login-alert"></div>
+    <div class="form-group" style="text-align:left;">
+      <label class="form-label">Password</label>
+      <input class="form-control" type="password" id="admin-password" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')login()">
+    </div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="login()">Sign In →</button>
+    
+  </div>
+</div>
+
+<!-- ADMIN APP -->
+<div id="admin-app">
+  <div class="admin-layout">
+    <div class="sidebar">
+      <div class="sidebar-item active" onclick="showTab('overview', this)">
+        <span class="sidebar-icon">📊</span> Overview
+      </div>
+      <div class="sidebar-item" onclick="showTab('sessions', this)">
+        <span class="sidebar-icon">📅</span> Sessions
+      </div>
+      <div class="sidebar-item" onclick="showTab('registrations', this)">
+        <span class="sidebar-icon">👥</span> Registrations
+      </div>
+      <div class="sidebar-item" onclick="showTab('community', this);">
+        <span class="sidebar-icon">🤝</span> Community
+      </div>
+      <div style="padding-top:24px;">
+        <a href="sessions.html" class="sidebar-item" target="_blank">
+          <span class="sidebar-icon">🔗</span> View Site
+        </a>
+      </div>
+    </div>
+
+    <div class="admin-main">
+
+      <!-- OVERVIEW -->
+      <div class="tab-content active" id="tab-overview">
+        <div class="page-header">
+          <h1>Dashboard Overview</h1>
+          <p>Monitor your Tech-o-nicks Program activity.</p>
+        </div>
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-icon blue">📅</div><div><div class="stat-value" id="s-total">—</div><div class="stat-label">Total Sessions</div></div></div>
+          <div class="stat-card"><div class="stat-icon green">✅</div><div><div class="stat-value" id="s-active">—</div><div class="stat-label">Active Sessions</div></div></div>
+          <div class="stat-card"><div class="stat-icon yellow">👥</div><div><div class="stat-value" id="s-regs">—</div><div class="stat-label">Total Registrations</div></div></div>
+          <div class="stat-card"><div class="stat-icon" style="background:#E8F0FE;">🤝</div><div><div class="stat-value" id="s-community">—</div><div class="stat-label">Community Members</div></div></div>
+        </div>
+        <div class="section-title" style="margin-bottom:12px;">Recent Sessions</div>
+        <div id="overview-sessions"><div class="spinner"></div></div>
+      </div>
+
+      <!-- SESSIONS -->
+      <div class="tab-content" id="tab-sessions">
+        <div class="actions-bar">
+          <div class="page-header" style="padding:0;">
+            <h1>Manage Sessions</h1>
+            <p>Create, edit, and manage all sessions.</p>
+          </div>
+          <button class="btn btn-primary" onclick="openCreateModal()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            New Session
+          </button>
+        </div>
+        <div id="sessions-table-wrap"><div class="spinner"></div></div>
+      </div>
+
+      <!-- REGISTRATIONS -->
+      <div class="tab-content" id="tab-registrations">
+        <div class="page-header">
+          <h1>Registrations</h1>
+          <p>View registrations for each session.</p>
+        </div>
+        <div class="form-group" style="max-width:340px;">
+          <label class="form-label">Select Session</label>
+          <select class="form-control" id="reg-session-select" onchange="loadRegistrations()">
+            <option value="">Choose a session...</option>
+          </select>
+        </div>
+        <div id="registrations-table-wrap"></div>
+      </div>
+
+      <div class="tab-content" id="tab-community">
+        <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+          <div>
+            <h1>Community Members</h1>
+            <p>People who joined via the Join Community form.</p>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="exportCommunityCSV()">⬇ Export CSV</button>
+        </div>
+        <div id="community-table-wrap"><div class="spinner"></div></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- SESSION MODAL -->
+<div class="modal-overlay" id="session-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="modal-title">Create New Session</h2>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="modal-alert"></div>
+      <input type="hidden" id="edit-id">
+      <div class="form-group">
+        <label class="form-label">Session Title <span class="req">*</span></label>
+        <input class="form-control" type="text" id="f-title" placeholder="e.g. Introduction to Google Cloud">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Description <span class="req">*</span></label>
+        <textarea class="form-control" id="f-desc" placeholder="What will attendees learn?"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Speaker Name <span class="req">*</span></label>
+          <input class="form-control" type="text" id="f-speaker" placeholder="Speaker full name">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Venue <span class="req">*</span></label>
+          <input class="form-control" type="text" id="f-venue" placeholder="Room / Online / Lab">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Date <span class="req">*</span></label>
+          <input class="form-control" type="date" id="f-date">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Time <span class="req">*</span></label>
+          <input class="form-control" type="time" id="f-time">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Duration (minutes) <span class="req">*</span></label>
+          <input class="form-control" type="number" id="f-duration" placeholder="90" min="15">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Max Capacity</label>
+          <input class="form-control" type="number" id="f-capacity" placeholder="100" min="1">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Google Meet Link</label>
+        <input class="form-control" type="url" id="f-meet" placeholder="https://meet.google.com/xxx-xxxx-xxx">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Session Image <span style="color:var(--text-muted);font-weight:400;">(optional banner shown on the session card)</span></label>
+        <input class="form-control" type="file" id="f-image" accept="image/*" onchange="handleImageSelect(event)">
+        <div id="image-preview-wrap" style="display:none;margin-top:10px;position:relative;max-width:220px;">
+          <img id="image-preview" style="width:100%;border-radius:var(--radius);border:1.5px solid var(--border);display:block;">
+          <button type="button" onclick="removeImage()" style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;width:24px;height:24px;cursor:pointer;line-height:1;">✕</button>
+        </div>
+        <div id="image-error" style="color:var(--google-red);font-size:0.8rem;margin-top:6px;"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tags <span style="color:var(--text-muted);font-weight:400;">(comma-separated)</span></label>
+        <input class="form-control" type="text" id="f-tags" placeholder="Cloud, AI, Firebase, Android">
+      </div>
+      <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:8px;">
+        <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-primary" id="modal-submit-btn" onclick="submitSession()">Create Session</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── AUTH ──
+async function login() {
+  const pw = document.getElementById('admin-password').value;
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/admin/login`, { method:'POST', credentials: 'include', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ password: pw }) });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Login failed');
+    showAdminApp();
+  } catch(err) {
+    document.getElementById('login-alert').innerHTML = `<div class="alert alert-error">⚠️ ${err.message}</div>`;
+  }
+}
+
+async function logout() {
+  await fetch(`${API_BASE_URL}/api/admin/logout`, { method:'POST', credentials: 'include' });
+  location.reload();
+}
+
+function showAdminApp() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('admin-app').style.display = 'block';
+  document.getElementById('admin-nav').classList.add('authed');
+  loadOverview();
+  loadSessionsTable();
+  loadSessionSelect();
+}
+
+fetch(`${API_BASE_URL}/api/admin/status`,{ credentials: 'include' }).then(r => r.json()).then(d => { if (d.isAdmin) showAdminApp(); });
+
+// ── TABS ──
+function showTab(name, el) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
+  if (name === 'community') loadCommunity();
+  document.getElementById('tab-' + name).classList.add('active');
+  el.classList.add('active');
+}
+
+// ── OVERVIEW ──
+async function loadOverview() {
+  try {
+    const [statsRes, sessionsRes] = await Promise.all([
+      fetch(`${API_BASE_URL}/api/admin/stats`,{ credentials: 'include' }),
+      fetch(`${API_BASE_URL}/api/admin/sessions`,{ credentials: 'include' })
+    ]);
+    if (!statsRes.ok || !sessionsRes.ok) throw new Error('Unauthorized or server error');
+    const stats = await statsRes.json();
+    const allSessions = await sessionsRes.json();
+
+    document.getElementById('s-total').textContent  = stats.totalSessions;
+    document.getElementById('s-active').textContent = stats.activeSessions;
+    document.getElementById('s-regs').textContent   = stats.totalRegistrations;
+    document.getElementById('s-community').textContent = stats.totalCommunityMembers ?? '—';
+
+    // Filter to only upcoming (today or future) sessions
+    const today = new Date(); today.setHours(0,0,0,0);
+    const sessions = allSessions.filter(s => new Date(s.date) >= today);
+
+    const wrap = document.getElementById('overview-sessions');
+    if (!sessions.length) {
+      wrap.innerHTML = `<div class="empty"><div class="empty-icon">📭</div><h3>No upcoming sessions</h3><p>Create your first session.</p></div>`;
+      return;
+    }
+    wrap.innerHTML = `<div class="table-wrap"><table>
+      <thead><tr><th>Title</th><th>Date</th><th>Speaker</th><th>Registrations</th><th>Status</th></tr></thead>
+      <tbody>${sessions.slice(0,5).map(s => `<tr>
+        <td><strong>${s.title}</strong></td>
+        <td>${new Date(s.date).toLocaleDateString('en-IN')}</td>
+        <td>${s.speaker}</td>
+        <td>${s.registrationCount} / ${s.maxCapacity}</td>
+        <td><span class="badge ${s.isActive ? 'badge-active' : 'badge-inactive'}">${s.isActive ? 'Active' : 'Inactive'}</span></td>
+      </tr>`).join('')}</tbody>
+    </table></div>`;
+  } catch(e) {
+    document.getElementById('overview-sessions').innerHTML = `<div class="alert alert-error">⚠️ Failed to load data. Please ensure you are logged in.</div>`;
+    ['s-total','s-active','s-regs','s-community'].forEach(id => document.getElementById(id).textContent = '—');
+  }
+}
+
+// ── SESSIONS TABLE ──
+async function loadSessionsTable() {
+  const wrap = document.getElementById('sessions-table-wrap');
+  wrap.innerHTML = '<div class="spinner"></div>';
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/admin/sessions`, { credentials: 'include' });
+    if (!res.ok) {
+      if (res.status === 401) {
+        wrap.innerHTML = `<div class="alert alert-error">⚠️ Session expired. Please <a href="#" onclick="logout()">log in again</a>.</div>`;
+      } else {
+        wrap.innerHTML = `<div class="alert alert-error">Failed to load sessions (HTTP ${res.status}). Please try again.</div>`;
+      }
+      return;
+    }
+    const sessions = await res.json();
+    if (!Array.isArray(sessions) || !sessions.length) {
+      wrap.innerHTML = `<div class="empty"><div class="empty-icon">📭</div><h3>No sessions yet</h3><p>Click "New Session" to create one.</p></div>`;
+      return;
+    }
+    wrap.innerHTML = `<div class="table-wrap"><table>
+      <thead><tr><th>Title</th><th>Date & Time</th><th>Speaker</th><th>Capacity</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>${sessions.map(s => {
+        const title    = s.title    || '(Untitled)';
+        const speaker  = s.speaker  || '—';
+        const time     = s.time     || '—';
+        const duration = s.duration != null ? s.duration : '—';
+        const date     = s.date ? new Date(s.date).toLocaleDateString('en-IN') : '—';
+        const tags     = (s.tags || []).join(', ') || '—';
+        const regCount = s.registrationCount ?? 0;
+        const maxCap   = s.maxCapacity ?? '—';
+        const safeTitleAttr = title.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+        return `<tr>
+        <td><strong>${title}</strong><br><small style="color:var(--text-muted)">${tags}</small></td>
+        <td>${date}<br><small>${time} (${duration} min)</small></td>
+        <td>${speaker}</td>
+        <td>${regCount} / ${maxCap}</td>
+        <td><span class="badge ${s.isActive ? 'badge-active' : 'badge-inactive'}">${s.isActive ? 'Active' : 'Inactive'}</span></td>
+        <td>
+          <div class="actions">
+            <button class="btn btn-secondary btn-sm" onclick='openEditModal(${JSON.stringify(s)})'>Edit</button>
+            <button class="btn btn-sm" style="background:${s.isActive ? '#FEF7E0' : '#E6F4EA'};color:${s.isActive ? '#8C6D00' : '#1E7E34'};" onclick="toggleSession('${s._id}')">
+              ${s.isActive ? 'Deactivate' : 'Activate'}
+            </button>
+            <button class="btn btn-danger btn-sm" onclick="deleteSession('${s._id}', '${safeTitleAttr}')">Delete</button>
+          </div>
+        </td>
+      </tr>`;
+      }).join('')}</tbody>
+    </table></div>`;
+  } catch(e) {
+    console.error('loadSessionsTable error:', e);
+    wrap.innerHTML = `<div class="alert alert-error">Failed to load sessions: ${e.message}. Check your connection and try refreshing.</div>`;
+  }
+}
+
+// ── MODAL ──
+function openCreateModal() {
+  document.getElementById('modal-title').textContent = 'Create New Session';
+  document.getElementById('modal-submit-btn').textContent = 'Create Session';
+  document.getElementById('edit-id').value = '';
+  ['title','desc','speaker','venue','date','time','duration','meet','tags'].forEach(f => {
+    const el = document.getElementById('f-'+f);
+    if (el) el.value = '';
+  });
+  document.getElementById('f-capacity').value = '100';
+  document.getElementById('modal-alert').innerHTML = '';
+  resetImageField();
+  // Prevent selecting past dates
+  const todayStr = new Date().toISOString().split('T')[0];
+  document.getElementById('f-date').min = todayStr;
+  document.getElementById('session-modal').classList.add('open');
+}
+
+function openEditModal(s) {
+  document.getElementById('modal-title').textContent = 'Edit Session';
+  document.getElementById('modal-submit-btn').textContent = 'Save Changes';
+  document.getElementById('edit-id').value       = s._id;
+  document.getElementById('f-title').value       = s.title;
+  document.getElementById('f-desc').value        = s.description;
+  document.getElementById('f-speaker').value     = s.speaker;
+  document.getElementById('f-venue').value       = s.venue;
+  document.getElementById('f-date').value        = new Date(s.date).toISOString().split('T')[0];
+  document.getElementById('f-time').value        = s.time;
+  document.getElementById('f-duration').value    = s.duration;
+  document.getElementById('f-capacity').value    = s.maxCapacity;
+  document.getElementById('f-meet').value        = s.meetLink || '';
+  document.getElementById('f-tags').value        = (s.tags||[]).join(', ');
+  document.getElementById('modal-alert').innerHTML = '';
+  resetImageField();
+  if (s.image) {
+    currentImageBase64 = s.image;
+    showImagePreview(s.image);
+  }
+  document.getElementById('session-modal').classList.add('open');
+}
+
+function closeModal() { document.getElementById('session-modal').classList.remove('open'); }
+
+// ── SESSION IMAGE UPLOAD ──
+let currentImageBase64 = null; // holds the base64 data URI of the currently selected/existing image
+let imageRemoved = false;      // true when editing and the user explicitly removed the existing image
+
+function resetImageField() {
+  currentImageBase64 = null;
+  imageRemoved = false;
+  document.getElementById('f-image').value = '';
+  document.getElementById('image-preview-wrap').style.display = 'none';
+  document.getElementById('image-preview').src = '';
+  document.getElementById('image-error').textContent = '';
+}
+
+function showImagePreview(src) {
+  document.getElementById('image-preview').src = src;
+  document.getElementById('image-preview-wrap').style.display = 'block';
+}
+
+function handleImageSelect(event) {
+  const file = event.target.files[0];
+  document.getElementById('image-error').textContent = '';
+  if (!file) return;
+  if (!file.type.startsWith('image/')) {
+    document.getElementById('image-error').textContent = 'Please choose an image file.';
+    event.target.value = '';
+    return;
+  }
+  if (file.size > 5 * 1024 * 1024) {
+    document.getElementById('image-error').textContent = 'Image is too large (max 5MB).';
+    event.target.value = '';
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = () => {
+    currentImageBase64 = reader.result;
+    imageRemoved = false;
+    showImagePreview(currentImageBase64);
+  };
+  reader.onerror = () => {
+    document.getElementById('image-error').textContent = 'Could not read that image, please try another.';
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeImage() {
+  currentImageBase64 = null;
+  imageRemoved = true;
+  document.getElementById('f-image').value = '';
+  document.getElementById('image-preview-wrap').style.display = 'none';
+  document.getElementById('image-preview').src = '';
+}
+
+document.getElementById('session-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+async function submitSession() {
+  const editId = document.getElementById('edit-id').value;
+  const body = {
+    title:       document.getElementById('f-title').value.trim(),
+    description: document.getElementById('f-desc').value.trim(),
+    speaker:     document.getElementById('f-speaker').value.trim(),
+    venue:       document.getElementById('f-venue').value.trim(),
+    date:        document.getElementById('f-date').value,
+    time:        document.getElementById('f-time').value,
+    duration:    parseInt(document.getElementById('f-duration').value),
+    maxCapacity: parseInt(document.getElementById('f-capacity').value) || 100,
+    meetLink:    document.getElementById('f-meet').value.trim(),
+    tags:        document.getElementById('f-tags').value,
+  };
+
+  // Only send `image` when it changed: a newly picked file, or an explicit
+  // removal on an existing session. Otherwise leave the saved image untouched.
+  if (currentImageBase64) {
+    body.image = currentImageBase64;
+  } else if (editId && imageRemoved) {
+    body.image = '';
+  }
+
+  if (!body.title || !body.description || !body.speaker || !body.venue || !body.date || !body.time || !body.duration) {
+    document.getElementById('modal-alert').innerHTML = `<div class="alert alert-error">⚠️ Please fill in all required fields.</div>`;
+    return;
+  }
+
+  // Prevent past dates on create
+  if (!editId) {
+    const today = new Date(); today.setHours(0,0,0,0);
+    if (new Date(body.date) < today) {
+      document.getElementById('modal-alert').innerHTML = `<div class="alert alert-error">⚠️ Session date cannot be in the past.</div>`;
+      return;
+    }
+  }
+
+  const btn = document.getElementById('modal-submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Saving...';
+
+  try {
+
+  const url = editId
+    ? `${API_BASE_URL}/api/admin/sessions/${editId}`
+    : `${API_BASE_URL}/api/admin/sessions`;
+
+  const method = editId ? 'PUT' : 'POST';
+
+  const res = await fetch(url, {
+    method,
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(body)
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) throw new Error(data.error);
+
+  closeModal();
+
+  loadSessionsTable();
+  loadOverview();
+  loadSessionSelect();
+
+} catch(err) {
+
+  document.getElementById('modal-alert').innerHTML =
+    `<div class="alert alert-error">
+      ⚠️ ${err.message}
+    </div>`;
+
+} finally {
+
+  btn.disabled = false;
+  btn.textContent = editId
+    ? 'Save Changes'
+    : 'Create Session';
+
+}
+}
+
+async function toggleSession(id) {
+  await fetch(`${API_BASE_URL}/api/admin/sessions/${id}/toggle`, { method:'PATCH',credentials: 'include' });
+  loadSessionsTable();
+  loadOverview();
+}
+
+async function deleteSession(id, title) {
+  if (!confirm(`Delete "${title}"? All registrations will also be removed.`)) return;
+  await fetch(`${API_BASE_URL}/api/admin/sessions/${id}`, { method:'DELETE',credentials: 'include' });
+  loadSessionsTable();
+  loadOverview();
+  loadSessionSelect();
+}
+
+// ── REGISTRATIONS ──
+async function loadSessionSelect() {
+  try {
+    const sessions = await fetch(`${API_BASE_URL}/api/admin/sessions`,{ credentials: 'include' }).then(r => r.json());
+    const sel = document.getElementById('reg-session-select');
+    sel.innerHTML = `<option value="">Choose a session...</option>` +
+      sessions.map(s => `<option value="${s._id}">${s.title} (${new Date(s.date).toLocaleDateString('en-IN')})</option>`).join('');
+  } catch(e) {}
+}
+
+async function loadCommunity() {
+  const wrap = document.getElementById('community-table-wrap');
+  wrap.innerHTML = '<div class="spinner"></div>';
+  try {
+    const members = await fetch(`${API_BASE_URL}/api/admin/community`,{ credentials: 'include' }).then(r => r.json());
+    if (!members.length) {
+      wrap.innerHTML = `<div class="empty"><div class="empty-icon">👥</div><h3>No community members yet</h3><p>Share the Join Community link with students.</p></div>`;
+      return;
+    }
+    wrap.innerHTML = `<div class="table-wrap"><table>
+      <thead><tr><th>Name</th><th>Email</th><th>Roll No.</th><th>Phone</th><th>College</th><th>Branch</th><th>Year</th><th>Experience</th><th>Interests</th><th>Joined</th><th>Actions</th></tr></thead>
+      <tbody>${members.map(m => `<tr>
+        <td><strong>${m.fullName}</strong></td>
+        <td style="font-size:0.8rem;">${m.email}</td>
+        <td>${m.rollNumber || '—'}</td>
+        <td>${m.phone}</td>
+        <td style="font-size:0.85rem;">${m.college}</td>
+        <td>${m.branch}</td>
+        <td>${m.year}</td>
+        <td><span class="badge badge-active" style="text-transform:capitalize;">${m.experience}</span></td>
+        <td style="font-size:0.8rem;">${(m.interests||[]).join(', ') || '—'}</td>
+        <td style="font-size:0.8rem;">${new Date(m.joinedAt).toLocaleDateString('en-IN')}</td>
+        <td><button class="btn btn-danger btn-sm" onclick="deleteCommunityMember('${m._id}', '${m.fullName.replace(/'/g,"\\'")}')">Delete</button></td>
+      </tr>`).join('')}</tbody>
+    </table></div>
+    <div style="margin-top:10px;color:var(--text-muted);font-size:0.85rem;">${members.length} member${members.length !== 1 ? 's' : ''} total</div>`;
+  } catch(e) {
+    wrap.innerHTML = `<div class="alert alert-error">Failed to load community members</div>`;
+  }
+}
+
+async function deleteCommunityMember(id, name) {
+  if (!confirm(`Remove "${name}" from the community? This cannot be undone.`)) return;
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/admin/community/${id}`, { method: 'DELETE', credentials: 'include' });
+    if (!res.ok) throw new Error('Failed to delete');
+    loadCommunity();
+  } catch(e) {
+    alert('Error: ' + e.message);
+  }
+}
+
+function exportCommunityCSV() {
+  fetch(`${API_BASE_URL}/api/admin/community`,{ credentials: 'include' })
+    .then(r => r.json())
+    .then(members => {
+      if (!members.length) return alert('No members to export.');
+      const headers = ['Name','Email','Roll No.','Phone','College','Branch','Year','Experience','Interests','Why Join','Joined At'];
+      const rows = members.map(m => [
+        m.fullName, m.email, m.rollNumber || '', m.phone,
+        m.college, m.branch, m.year, m.experience,
+        (m.interests||[]).join('; '),
+        (m.whyJoin||'').replace(/,/g,''),
+        new Date(m.joinedAt).toLocaleDateString('en-IN')
+      ].map(v => `"${v}"`).join(','));
+      const csv = [headers.join(','), ...rows].join('\n');
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv'}));
+      a.download = 'community_members.csv';
+      a.click();
+    });
+}
+
+async function loadRegistrations() {
+  const id = document.getElementById('reg-session-select').value;
+  const wrap = document.getElementById('registrations-table-wrap');
+  if (!id) { wrap.innerHTML = ''; return; }
+  wrap.innerHTML = '<div class="spinner"></div>';
+  try {
+    const regs = await fetch(`${API_BASE_URL}/api/admin/sessions/${id}/registrations`,{ credentials: 'include' }).then(r => r.json());
+    if (!regs.length) {
+      wrap.innerHTML = `<div class="empty"><div class="empty-icon">📭</div><h3>No registrations yet</h3></div>`;
+      return;
+    }
+    wrap.innerHTML = `<div class="table-wrap"><table>
+      <thead><tr><th>#</th><th>Name</th><th>Email</th><th>Phone</th><th>College</th><th>Branch</th><th>Year</th><th>Experience</th><th>Registered</th><th>Action</th></tr></thead>
+      <tbody>${regs.map((r, i) => `<tr id="reg-row-${r._id}">
+        <td>${i+1}</td>
+        <td><strong>${r.fullName}</strong></td>
+        <td>${r.email}</td>
+        <td>${r.phone}</td>
+        <td>${r.college}</td>
+        <td>${r.branch}</td>
+        <td>${r.year}</td>
+        <td><span class="badge" style="background:${r.experience==='advanced'?'#E8F0FE':r.experience==='intermediate'?'#FEF7E0':'#E6F4EA'};color:${r.experience==='advanced'?'var(--google-blue)':r.experience==='intermediate'?'#8C6D00':'#1E7E34'}">${r.experience}</span></td>
+        <td>${new Date(r.registeredAt).toLocaleDateString('en-IN')}</td>
+        <td><button onclick="deleteRegistration('${r._id}', '${r.fullName.replace(/'/g, "\\'")}')" style="background:#FCE8E6;color:#C5221F;border:none;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:0.8rem;font-weight:600;">🗑 Delete</button></td>
+      </tr>`).join('')}</tbody>
+    </table></div>
+    <div style="margin-top:12px;font-size:.85rem;color:var(--text-muted);">${regs.length} registration${regs.length !== 1 ? 's' : ''} total</div>`;
+  } catch(e) {
+    wrap.innerHTML = `<div class="alert alert-error">Failed to load registrations</div>`;
+  }
+}
+
+async function deleteRegistration(regId, name) {
+  if (!confirm(`Delete registration for "${name}"? This cannot be undone.`)) return;
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/admin/registrations/${regId}`, {
+      method: 'DELETE',
+      credentials: 'include'
+    });
+    const data = await res.json();
+    if (data.success) {
+      const row = document.getElementById(`reg-row-${regId}`);
+      if (row) row.remove();
+      // Update the count label
+      const wrap = document.getElementById('registrations-table-wrap');
+      const rows = wrap.querySelectorAll('tbody tr');
+      const label = wrap.querySelector('div[style*="margin-top"]');
+      if (label) label.textContent = `${rows.length} registration${rows.length !== 1 ? 's' : ''} total`;
+      if (!rows.length) {
+        wrap.innerHTML = `<div class="empty"><div class="empty-icon">📭</div><h3>No registrations yet</h3></div>`;
+      }
+    } else {
+      alert('Failed to delete: ' + (data.error || 'Unknown error'));
+    }
+  } catch(e) {
+    alert('Network error while deleting registration.');
+  }
+}
+</script>
+</body>
+</html>

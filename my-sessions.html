@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Sessions – Tech-o-nicks Program</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="config.js"></script>
+  <style>
+    .profile-bar { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; background:white; border:1px solid var(--border); border-radius:var(--radius-lg); padding:18px 22px; margin-bottom:24px; }
+    .profile-bar .name { font-family:'Nunito',sans-serif; font-weight:800; font-size:1.1rem; }
+    .profile-bar .meta { color:var(--text-secondary); font-size:0.85rem; }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-dots">
+        <span class="dot-b"></span><span class="dot-r"></span>
+        <span class="dot-y"></span><span class="dot-g"></span>
+      </div>
+      <span class="nav-logo-text"><span>Tech-o-nicks</span></span>
+    </a>
+    <button class="nav-toggle" onclick="this.classList.toggle('active'); this.closest('.nav-inner').querySelector('.nav-links').classList.toggle('open')" aria-label="Toggle menu">
+      <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+    </button>
+    <div class="nav-links">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="sessions.html" class="nav-link">Sessions</a>
+      <a href="my-sessions.html" class="nav-link active">My Sessions</a>
+      <button class="btn btn-secondary btn-sm" onclick="logout()">Logout</button>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="page-header">
+    <h1>My Sessions</h1>
+    <p>Sessions you've registered for with the Tech-o-nicks Program.</p>
+  </div>
+
+  <div class="profile-bar" id="profile-bar">
+    <div class="spinner" style="width:20px;height:20px;border-width:2px;margin:0;"></div>
+  </div>
+
+  <div class="sessions-grid" id="my-sessions-grid">
+    <div class="spinner" style="grid-column:1/-1;"></div>
+  </div>
+</div>
+
+<footer>
+  <p>Tech-o-nicks Program — <a href="/sessions">Browse Sessions</a> · <a href="/">Home</a></p>
+</footer>
+
+<script>
+async function logout() {
+  await fetch(`${API_BASE_URL}/api/student/logout`, { method: 'POST', credentials: 'include' });
+  location.href = '/login';
+}
+
+async function init() {
+  const statusRes = await fetch(`${API_BASE_URL}/api/student/status`, { credentials: 'include' }).then(r => r.json()).catch(() => ({ loggedIn: false }));
+  if (!statusRes.loggedIn) {
+    location.href = '/login';
+    return;
+  }
+
+  const m = statusRes.member;
+  document.getElementById('profile-bar').innerHTML = `
+    <div>
+      <div class="name">${m.fullName}</div>
+      <div class="meta">${m.email} · Roll No: ${m.rollNumber} · ${m.college}</div>
+    </div>
+    <a href="/sessions" class="btn btn-primary btn-sm">Browse More Sessions</a>
+  `;
+
+  try {
+    const entries = await fetch(`${API_BASE_URL}/api/student/my-sessions`, { credentials: 'include' }).then(r => r.json());
+    const grid = document.getElementById('my-sessions-grid');
+    if (!Array.isArray(entries) || !entries.length) {
+      grid.innerHTML = `<div class="empty" style="grid-column:1/-1"><div class="empty-icon">📭</div><h3>No sessions joined yet</h3><p>Browse sessions and register to see them here.</p></div>`;
+      return;
+    }
+    grid.innerHTML = entries.map(({ session: s }) => {
+      const dateStr = new Date(s.date).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
+      const tags = (s.tags||[]).map(t => `<span class="tag">${t}</span>`).join('');
+      return `
+        <div class="session-card">
+          ${s.image ? `<img class="session-card-image" src="${s.image}" alt="${s.title}">` : ''}
+          <div class="session-card-header">
+            <div class="session-tags">${tags || '<span class="tag">General</span>'}</div>
+            <h3>${s.title}</h3>
+            <p>${s.description.substring(0,120)}${s.description.length > 120 ? '...' : ''}</p>
+          </div>
+          <div class="session-card-body">
+            <div class="session-meta">
+              <div class="meta-item"><span class="meta-icon">👤</span>${s.speaker}</div>
+              <div class="meta-item"><span class="meta-icon">📅</span>${dateStr} at ${s.time}</div>
+              <div class="meta-item"><span class="meta-icon">⏱️</span>${s.duration} minutes</div>
+              <div class="meta-item"><span class="meta-icon">📍</span>${s.venue}</div>
+              ${s.meetLink ? `<div class="meta-item"><span class="meta-icon">🔗</span><a href="${s.meetLink}" target="_blank" style="color:var(--google-blue)">Join Online</a></div>` : ''}
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+  } catch (e) {
+    document.getElementById('my-sessions-grid').innerHTML = `<div class="empty" style="grid-column:1/-1"><div class="empty-icon">⚠️</div><h3>Failed to load your sessions</h3></div>`;
+  }
+}
+
+init();
+</script>
+</body>
+</html>

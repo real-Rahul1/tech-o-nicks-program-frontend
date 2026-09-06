@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sessions – Tech-o-nicks Program</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="config.js"></script>
+  <style>
+    .filter-bar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
+    .filter-btn { padding: 8px 18px; border-radius: 20px; border: 1.5px solid var(--border); background: white; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); cursor: pointer; transition: all .2s; font-family: inherit; }
+    .filter-btn.active { background: var(--google-blue); color: white; border-color: var(--google-blue); }
+    .filter-btn:hover:not(.active) { border-color: var(--google-blue); color: var(--google-blue); }
+    .search-box { flex: 1; min-width: 200px; max-width: 320px; position: relative; }
+    .search-box input { width: 100%; padding: 10px 16px 10px 40px; border-radius: 24px; border: 1.5px solid var(--border); font-size: 0.875rem; outline: none; font-family: inherit; transition: border .2s; }
+    .search-box input:focus { border-color: var(--google-blue); }
+    .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-dots">
+        <span class="dot-b"></span><span class="dot-r"></span>
+        <span class="dot-y"></span><span class="dot-g"></span>
+      </div>
+      <span class="nav-logo-text"><span>Tech-o-nicks</span></span>
+    </a>
+    <button class="nav-toggle" onclick="this.classList.toggle('active'); this.closest('.nav-inner').querySelector('.nav-links').classList.toggle('open')" aria-label="Toggle menu">
+      <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+    </button>
+    <div class="nav-links">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="sessions.html" class="nav-link active">Sessions</a>
+      <a href="login.html" class="nav-link">Login</a>
+      <a href="admin.html" class="nav-link">Admin</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="page-header">
+    <h1>All Sessions</h1>
+    <p>Browse and register for upcoming Tech-o-nicks sessions.</p>
+  </div>
+
+  <div class="filter-bar">
+    <div class="search-box">
+      <span class="search-icon">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      </span>
+      <input type="text" id="search" placeholder="Search sessions..." oninput="renderSessions()">
+    </div>
+    <button class="filter-btn active" onclick="setFilter('all', this)">All</button>
+    <button class="filter-btn" onclick="setFilter('upcoming', this)">Upcoming</button>
+    <button class="filter-btn" onclick="setFilter('past', this)">Past</button>
+  </div>
+
+  <div class="sessions-grid" id="sessions-grid">
+    <div class="spinner" style="grid-column:1/-1;"></div>
+  </div>
+</div>
+
+<footer>
+  <p>Tech-o-nicks Program —Build By TeamX <a href="index.html">Home</a> · </a></p>
+</footer>
+
+<script>
+let allSessions = [];
+let currentFilter = 'all';
+
+// Combines s.date (ISO string) and s.time ("HH:MM") into a proper Date object
+function getSessionDateTime(s) {
+  const datePart = s.date.substring(0, 10); // "2026-05-31"
+  return new Date(`${datePart}T${s.time}:00`); // "2026-05-31T17:00:00"
+}
+
+fetch(`${API_BASE_URL}/api/sessions`)
+  .then(r => r.json())
+  .then(async sessions => {
+    allSessions = await Promise.all(sessions.map(async s => {
+      const detail = await fetch(`${API_BASE_URL}/api/sessions/${s._id}`).then(r => r.json()).catch(() => s);
+      return { ...s, registrationCount: detail.registrationCount || 0 };
+    }));
+    const now = new Date();
+    allSessions.sort((a, b) => {
+      const aUp = getSessionDateTime(a) >= now;
+      const bUp = getSessionDateTime(b) >= now;
+      if (aUp && !bUp) return -1;   // upcoming before past
+      if (!aUp && bUp) return 1;
+      if (aUp && bUp) return getSessionDateTime(a) - getSessionDateTime(b);  // upcoming: soonest first
+      return getSessionDateTime(b) - getSessionDateTime(a);  // past: most recent first
+    });
+    renderSessions();
+  }).catch(() => {
+    document.getElementById('sessions-grid').innerHTML = `<div class="empty" style="grid-column:1/-1"><div class="empty-icon">⚠️</div><h3>Failed to load sessions</h3><p>Please check your server connection.</p></div>`;
+  });
+
+function setFilter(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderSessions();
+}
+
+function renderSessions() {
+  const q = document.getElementById('search').value.toLowerCase();
+  const now = new Date();
+  const filtered = allSessions.filter(s => {
+    const matchSearch = !q || s.title.toLowerCase().includes(q) || s.description.toLowerCase().includes(q) || s.speaker.toLowerCase().includes(q) || (s.tags||[]).some(t => t.toLowerCase().includes(q));
+    const sessionDT = getSessionDateTime(s);
+    const matchFilter = currentFilter === 'all' || (currentFilter === 'upcoming' && sessionDT >= now) || (currentFilter === 'past' && sessionDT < now);
+    return matchSearch && matchFilter;
+  });
+
+  const grid = document.getElementById('sessions-grid');
+  if (!filtered.length) {
+    grid.innerHTML = `<div class="empty" style="grid-column:1/-1"><div class="empty-icon">📭</div><h3>No sessions found</h3><p>Try adjusting your filters.</p></div>`;
+    return;
+  }
+  grid.innerHTML = filtered.map(s => {
+    const sessionDT = getSessionDateTime(s);
+    const isPast = sessionDT < now;
+    const dateStr = new Date(s.date).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
+    const tags = (s.tags||[]).map(t => `<span class="tag">${t}</span>`).join('');
+    const pct = Math.min(100, (s.registrationCount||0) / s.maxCapacity * 100);
+    const fillClass = pct >= 90 ? 'danger' : pct >= 70 ? 'warning' : '';
+    const isFull = (s.registrationCount||0) >= s.maxCapacity;
+    return `
+      <div class="session-card" style="${isPast ? 'opacity:.7;' : ''}">
+        ${s.image ? `<img class="session-card-image" src="${s.image}" alt="${s.title}">` : ''}
+        <div class="session-card-header">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+            <div class="session-tags">${tags || '<span class="tag">General</span>'}</div>
+            ${isPast ? '<span class="badge badge-inactive">Past</span>' : isFull ? '<span class="badge badge-full">Full</span>' : '<span class="badge badge-active">Open</span>'}
+          </div>
+          <h3>${s.title}</h3>
+          <p>${s.description.substring(0,120)}${s.description.length > 120 ? '...' : ''}</p>
+        </div>
+        <div class="session-card-body">
+          <div class="session-meta">
+            <div class="meta-item"><span class="meta-icon">👤</span>${s.speaker}</div>
+            <div class="meta-item"><span class="meta-icon">📅</span>${dateStr} at ${s.time}</div>
+            <div class="meta-item"><span class="meta-icon">⏱️</span>${s.duration} minutes</div>
+            <div class="meta-item"><span class="meta-icon">📍</span>${s.venue}</div>
+            ${s.meetLink ? `<div class="meta-item"><span class="meta-icon">🔗</span><a href="${s.meetLink}" target="_blank" style="color:var(--google-blue)">Join Online</a></div>` : ''}
+          </div>
+        </div>
+        <div class="session-card-footer">
+          <div>
+            <div class="capacity-bar"><div class="capacity-fill ${fillClass}" style="width:${pct}%"></div></div>
+            <div class="capacity-text">${s.registrationCount||0} / ${s.maxCapacity} registered</div>
+          </div>
+          ${!isPast && !isFull
+            ? `<a href="/register?session=${s._id}" class="btn btn-primary btn-sm">Register →</a>`
+            : isPast
+              ? `<span style="font-size:.8rem;color:var(--text-muted)">Session ended</span>`
+              : `<span class="btn btn-sm" style="background:var(--surface-3);color:var(--text-muted);cursor:default;">Full</span>`}
+        </div>
+      </div>`;
+  }).join('');
+}
+</script>
+</body>
+</html>

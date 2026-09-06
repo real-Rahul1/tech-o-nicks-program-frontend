@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Log In – Tech-o-nicks Program</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="config.js"></script>
+  <style>
+    .login-wrap { max-width: 400px; margin: 80px auto; padding: 0 24px; }
+    .login-card { background: white; border: 1px solid var(--border); border-radius: var(--radius-xl); padding: 36px; box-shadow: var(--shadow-md); text-align: center; }
+    .login-logo .nav-logo-dots { width: 36px; gap: 5px; margin: 0 auto 12px; }
+    .login-logo .nav-logo-dots span { width: 14px; height: 14px; }
+    .login-card h2 { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1.4rem; margin-bottom: 6px; }
+    .login-card > p { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 24px; }
+    .login-card .form-group { text-align: left; }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-dots">
+        <span class="dot-b"></span><span class="dot-r"></span>
+        <span class="dot-y"></span><span class="dot-g"></span>
+      </div>
+      <span class="nav-logo-text"><span>Tech-o-nicks</span></span>
+    </a>
+    <button class="nav-toggle" onclick="this.classList.toggle('active'); this.closest('.nav-inner').querySelector('.nav-links').classList.toggle('open')" aria-label="Toggle menu">
+      <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+    </button>
+    <div class="nav-links">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="sessions.html" class="nav-link">Sessions</a>
+      <a href="join.html" class="nav-link">Join Community</a>
+    </div>
+  </div>
+</nav>
+
+<div class="login-wrap">
+  <div class="login-card">
+    <div class="login-logo" style="margin-bottom:20px;">
+      <div class="nav-logo-dots">
+        <span class="dot-b"></span><span class="dot-r"></span>
+        <span class="dot-y"></span><span class="dot-g"></span>
+      </div>
+      <span style="font-family:'Nunito',sans-serif;font-weight:800;font-size:1rem;">Student Login</span>
+    </div>
+    <h2>Welcome Back</h2>
+    <p>Log in with your community email &amp; password to view or register for sessions.</p>
+    <div id="login-alert"></div>
+    <div class="form-group">
+      <label class="form-label">Email Address</label>
+      <input class="form-control" type="email" id="s-email" placeholder="you@example.com" onkeydown="if(event.key==='Enter')document.getElementById('s-password').focus()">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Password</label>
+      <input class="form-control" type="password" id="s-password" placeholder="Your password" onkeydown="if(event.key==='Enter')login()">
+    </div>
+    <button class="btn btn-primary" id="login-btn" style="width:100%;justify-content:center;" onclick="login()">Log In →</button>
+    <p style="margin-top:18px;font-size:0.85rem;">Not a member yet? <a href="join.html">Join the community</a></p>
+  </div>
+</div>
+
+<footer>
+  <p>Tech-o-nicks Program — <a href="index.html">Home</a> · <a href="sessions.html">Sessions</a></p>
+</footer>
+
+<script>
+// If already logged in, skip straight to My Sessions.
+fetch(`${API_BASE_URL}/api/student/status`, { credentials: 'include' })
+  .then(r => r.json())
+  .then(d => { if (d.loggedIn) location.href = 'my-sessions.html'; })
+  .catch(() => {});
+
+async function login() {
+  const btn = document.getElementById('login-btn');
+  const alertBox = document.getElementById('login-alert');
+  alertBox.innerHTML = '';
+
+  const email = document.getElementById('s-email').value.trim();
+  const password = document.getElementById('s-password').value;
+
+  if (!email || !password) {
+    alertBox.innerHTML = '<div class="alert alert-error">⚠️ Please enter your email and password.</div>';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Logging in...';
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/student/login`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Login failed');
+    location.href = 'my-sessions.html';
+  } catch (err) {
+    alertBox.innerHTML = `<div class="alert alert-error">⚠️ ${err.message}</div>`;
+    btn.disabled = false;
+    btn.textContent = 'Log In →';
+  }
+}
+</script>
+</body>
+</html>

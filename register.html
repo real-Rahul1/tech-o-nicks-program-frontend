@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register – Tech-o-nicks Program</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="config.js"></script>
+  <style>
+    .form-card { background: white; border: 1px solid var(--border); border-radius: var(--radius-xl); padding: 32px; box-shadow: var(--shadow-sm); }
+    .divider { height: 1px; background: var(--border); margin: 24px 0; }
+    .section-label { font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.9rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .section-label::after { content:''; flex:1; height:1px; background:var(--border); }
+    .radio-group { display: flex; gap: 12px; flex-wrap: wrap; }
+    .radio-card { flex: 1; min-width: 100px; }
+    .radio-card input { display: none; }
+    .radio-card label { display: block; padding: 12px 16px; border: 1.5px solid var(--border); border-radius: var(--radius); text-align: center; cursor: pointer; transition: all .2s; font-size: 0.875rem; font-weight: 500; }
+    .radio-card label:hover { border-color: var(--google-blue); color: var(--google-blue); }
+    .radio-card input:checked + label { background: var(--blue-50); border-color: var(--google-blue); color: var(--google-blue); font-weight: 700; }
+    .rc-icon { font-size: 1.2rem; display: block; margin-bottom: 4px; }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-dots">
+        <span class="dot-b"></span><span class="dot-r"></span>
+        <span class="dot-y"></span><span class="dot-g"></span>
+      </div>
+      <span class="nav-logo-text"><span>Tech-o-nicks</span></span>
+    </a>
+    <button class="nav-toggle" onclick="this.classList.toggle('active'); this.closest('.nav-inner').querySelector('.nav-links').classList.toggle('open')" aria-label="Toggle menu">
+      <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+    </button>
+    <div class="nav-links">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="sessions.html" class="nav-link">Sessions</a>
+      <a href="login.html" class="nav-link">Login</a>
+    </div>
+  </div>
+</nav>
+
+<div class="register-layout">
+  <div class="session-info-box" id="session-info">
+    <div class="spinner" style="border-top-color:white;width:24px;height:24px;margin:0;border-width:2px;"></div>
+  </div>
+
+  <div id="quick-register-area" style="display:none;">
+    <div class="form-card" style="text-align:center;">
+      <div id="quick-alert"></div>
+      <p style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:4px;">Logged in as</p>
+      <h3 id="quick-name" style="margin-bottom:2px;"></h3>
+      <p id="quick-email" style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:20px;"></p>
+      <button class="btn btn-primary" id="quick-register-btn" onclick="quickRegister()" style="width:100%;justify-content:center;padding:14px;font-size:1rem;">
+        Register with One Click 🎉
+      </button>
+      <p style="margin-top:14px;font-size:0.8rem;color:var(--text-muted);">Not you? <a href="#" onclick="event.preventDefault();logoutAndShowForm();">Log out</a></p>
+    </div>
+  </div>
+
+  <div id="form-area">
+    <div class="form-card">
+      <div id="alert-container"></div>
+      <p style="font-size:0.85rem;margin-bottom:16px;">Already joined the community? <a href="login.html">Log in</a> to register in one click instead of filling this out.</p> 
+    </div> 
+
+      <div class="section-label">Personal Information 👤</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Full Name <span class="req">*</span></label>
+          <input class="form-control" type="text" id="fullName" placeholder="Your full name">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phone Number <span class="req">*</span></label>
+          <input class="form-control" type="tel" id="phone" placeholder="+91 ">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Email Address <span class="req">*</span></label>
+          <input class="form-control" type="email" id="email" placeholder="you@example.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Google Account Email <span class="req">*</span></label>
+          <input class="form-control" type="email" id="googleAccountEmail" placeholder="you@gmail.com">
+          <div class="form-hint">Used for Meet access & resources</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+      <div class="section-label">Academic Details 🎓</div>
+
+      <div class="form-group">
+        <label class="form-label">College / Institution <span class="req">*</span></label>
+        <input class="form-control" type="text" id="college" placeholder="e.g. CGEC">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Branch / Department <span class="req">*</span></label>
+          <select class="form-control" id="branch">
+            <option value="">Select branch...</option>
+            <option>Computer Science & Engineering</option>
+            <option>Electronics & Communication</option>
+            <option>Electrical Engineering</option>
+            <option>Mechanical Engineering</option>
+            <option>Civil Engineering</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Current Year <span class="req">*</span></label>
+          <select class="form-control" id="year">
+            <option value="">Select year...</option>
+            <option>1st Year</option>
+            <option>2nd Year</option>
+            <option>3rd Year</option>
+            <option>4th Year</option>
+            <option>5th Year</option>
+            <option>Postgraduate</option>
+            <option>Alumni</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+      <div class="section-label">Experience Level ⚡</div>
+
+      <div class="form-group">
+        <div class="radio-group">
+          <div class="radio-card">
+            <input type="radio" name="experience" id="exp-beginner" value="beginner">
+            <label for="exp-beginner"><span class="rc-icon">🌱</span>Beginner</label>
+          </div>
+          <div class="radio-card">
+            <input type="radio" name="experience" id="exp-intermediate" value="intermediate">
+            <label for="exp-intermediate"><span class="rc-icon">⚡</span>Intermediate</label>
+          </div>
+          <div class="radio-card">
+            <input type="radio" name="experience" id="exp-advanced" value="advanced">
+            <label for="exp-advanced"><span class="rc-icon">🚀</span>Advanced</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Why do you want to attend? <span style="color:var(--text-muted);font-weight:400;">(Optional)</span></label>
+        <textarea class="form-control" id="motivation" placeholder="Tell us what you're hoping to learn..." rows="3"></textarea>
+      </div>
+
+      <button class="btn btn-primary" onclick="submitRegistration()" id="submit-btn" style="width:100%;justify-content:center;padding:14px;font-size:1rem;border-radius:var(--radius);">
+        Register Now 🎉
+      </button>
+    </div>
+  </div>
+
+  <div id="success-screen" style="display:none;">
+    <div class="form-card success-screen">
+      <div class="success-icon">✅</div>
+      <h2>You're Registered!</h2>
+      <p id="success-msg">Your registration has been confirmed.</p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <a href="/sessions" class="btn btn-primary">Browse More Sessions</a>
+        <a href="/" class="btn btn-secondary">Back to Home</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>Tech-o-nicks Program — <a href="sessions.html">Sessions</a> · <a href="index.html">Home</a></p>
+</footer>
+
+<script>
+const params = new URLSearchParams(location.search);
+const sessionId = params.get('session');
+
+// If the student is already logged in, offer one-click registration
+// using their saved community profile instead of the full form.
+fetch(`${API_BASE_URL}/api/student/status`, { credentials: 'include' })
+  .then(r => r.json())
+  .then(d => {
+    if (d.loggedIn) {
+      document.getElementById('form-area').style.display = 'none';
+      document.getElementById('quick-register-area').style.display = 'block';
+      document.getElementById('quick-name').textContent = d.member.fullName;
+      document.getElementById('quick-email').textContent = d.member.email;
+    }
+  })
+  .catch(() => {});
+
+async function quickRegister() {
+  const btn = document.getElementById('quick-register-btn');
+  const alertBox = document.getElementById('quick-alert');
+  alertBox.innerHTML = '';
+
+  if (!sessionId) {
+    alertBox.innerHTML = '<div class="alert alert-error">⚠️ No session selected.</div>';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Registering...';
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/student/register`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sessionId })
+    });
+    const result = await res.json();
+    if (!res.ok) throw new Error(result.error || 'Registration failed');
+    document.getElementById('quick-register-area').style.display = 'none';
+    document.getElementById('session-info').style.display = 'none';
+    document.getElementById('success-msg').textContent = `You've successfully registered.`;
+    document.getElementById('success-screen').style.display = 'block';
+  } catch (err) {
+    alertBox.innerHTML = `<div class="alert alert-error">⚠️ ${err.message}</div>`;
+    btn.disabled = false;
+    btn.textContent = 'Register with One Click 🎉';
+  }
+}
+
+async function logoutAndShowForm() {
+  await fetch(`${API_BASE_URL}/api/student/logout`, { method: 'POST', credentials: 'include' });
+  document.getElementById('quick-register-area').style.display = 'none';
+  document.getElementById('form-area').style.display = 'block';
+}
+
+if (!sessionId) {
+  document.getElementById('session-info').innerHTML =
+    `<p style="color:rgba(255,255,255,.9)">
+      ⚠️ No session selected.
+      <a href="/sessions" style="color:white;font-weight:700;">
+        Browse sessions →
+      </a>
+    </p>`;
+} else {
+
+  fetch(`${API_BASE_URL}/api/sessions/${sessionId}`)
+    .then(r => r.json())
+    .then(s => {
+
+      if (s.error) throw new Error(s.error);
+
+      const date = new Date(s.date).toLocaleDateString(
+        'en-IN',
+        {
+          weekday:'long',
+          day:'numeric',
+          month:'long',
+          year:'numeric'
+        }
+      );
+
+      document.getElementById('session-info').innerHTML = `
+        <h2>📌 ${s.title}</h2>
+
+        <div class="meta">
+          <span>👤 ${s.speaker}</span>
+          <span>📅 ${date} · ${s.time}</span>
+          <span>📍 ${s.venue}</span>
+          <span>⏱️ ${s.duration} min</span>
+        </div>
+      `;
+
+    }).catch(() => {
+
+      document.getElementById('session-info').innerHTML =
+        `<p style="color:rgba(255,255,255,.9)">
+          <a href="/sessions" style="color:white;font-weight:700;">
+            Browse sessions →
+          </a>
+        </p>`;
+
+    });
+}
+
+function showAlert(msg, type = 'error') {
+  const c = document.getElementById('alert-container');
+  c.innerHTML = `<div class="alert alert-${type}"><span>${type === 'error' ? '⚠️' : '✅'}</span> ${msg}</div>`;
+  c.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+async function submitRegistration() {
+  const btn = document.getElementById('submit-btn');
+  const experience = document.querySelector('input[name="experience"]:checked')?.value;
+  const data = {
+    sessionId,
+    fullName: document.getElementById('fullName').value.trim(),
+    email: document.getElementById('email').value.trim(),
+    phone: document.getElementById('phone').value.trim(),
+    college: document.getElementById('college').value.trim(),
+    branch: document.getElementById('branch').value,
+    year: document.getElementById('year').value,
+    googleAccountEmail: document.getElementById('googleAccountEmail').value.trim(),
+    experience,
+    motivation: document.getElementById('motivation').value.trim(),
+  };
+
+  if (!data.fullName)        return showAlert('Please enter your full name.');
+  if (!data.email || !data.email.includes('@')) return showAlert('Please enter a valid email.');
+  if (!data.phone)           return showAlert('Please enter your phone number.');
+  if (!data.college)         return showAlert('Please enter your college name.');
+  if (!data.branch)          return showAlert('Please select your branch.');
+  if (!data.year)            return showAlert('Please select your current year.');
+  if (!data.googleAccountEmail || !data.googleAccountEmail.includes('@')) return showAlert('Please enter your Google account email.');
+  if (!experience)           return showAlert('Please select your experience level.');
+
+  btn.disabled = true;
+  btn.textContent = 'Registering...';
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    const result = await res.json();
+    if (!res.ok) throw new Error(result.error || 'Registration failed');
+    document.getElementById('form-area').style.display = 'none';
+    document.getElementById('session-info').style.display = 'none';
+    document.getElementById('success-msg').textContent = `You've successfully registered. Confirmation sent to ${data.email}.`;
+    document.getElementById('success-screen').style.display = 'block';
+  } catch (err) {
+    showAlert(err.message);
+    btn.disabled = false;
+    btn.textContent = 'Register Now 🎉';
+  }
+}
+</script>
+</body>
+</html>
