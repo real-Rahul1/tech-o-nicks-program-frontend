@@ -84,11 +84,25 @@
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">College / Institution <span style="color:red">*</span></label>
-          <input type="text" class="form-control" id="j-college" placeholder="Your college name">
+          <select class="form-control" id="j-college" onchange="toggleOtherInput('j-college', 'j-college-other')">
+            <option value="">Select college</option>
+            <option>CoochBehar Government Engineering College</option>
+            <option value="Others">Others</option>
+          </select>
+          <input type="text" class="form-control" id="j-college-other" placeholder="Enter your college name" style="display:none; margin-top:8px;">
         </div>
         <div class="form-group">
           <label class="form-label">Branch / Department <span style="color:red">*</span></label>
-          <input type="text" class="form-control" id="j-branch" placeholder="e.g. Computer Science">
+          <select class="form-control" id="j-branch" onchange="toggleOtherInput('j-branch', 'j-branch-other')">
+            <option value="">Select department</option>
+            <option value="CSE">CSE</option>
+            <option value="ECE">ECE</option>
+            <option value="ME">ME</option>
+            <option value="CE">CE</option>
+            <option value="EE">EE</option>
+            <option value="Others">Others</option>
+          </select>
+          <input type="text" class="form-control" id="j-branch-other" placeholder="Enter your department" style="display:none; margin-top:8px;">
         </div>
       </div>
       <div class="form-row">
@@ -180,6 +194,27 @@
 </footer>
 
 <script>
+function toggleOtherInput(selectId, otherInputId) {
+  const select = document.getElementById(selectId);
+  const otherInput = document.getElementById(otherInputId);
+  if (select.value === 'Others') {
+    otherInput.style.display = 'block';
+    otherInput.setAttribute('required', 'required');
+  } else {
+    otherInput.style.display = 'none';
+    otherInput.removeAttribute('required');
+    otherInput.value = '';
+  }
+}
+
+function getSelectValue(selectId, otherInputId) {
+  const select = document.getElementById(selectId);
+  if (select.value === 'Others') {
+    return document.getElementById(otherInputId).value.trim();
+  }
+  return select.value.trim();
+}
+
 async function submitJoin() {
   const btn = document.getElementById('join-btn');
   const alertBox = document.getElementById('join-alert');
@@ -194,8 +229,8 @@ async function submitJoin() {
     fullName:           document.getElementById('j-name').value.trim(),
     email:              document.getElementById('j-email').value.trim(),
     phone:              document.getElementById('j-phone').value.trim(),
-    college:            document.getElementById('j-college').value.trim(),
-    branch:             document.getElementById('j-branch').value.trim(),
+    college:            getSelectValue('j-college', 'j-college-other'),
+    branch:             getSelectValue('j-branch', 'j-branch-other'),
     rollNumber:         document.getElementById('j-roll').value.trim(),
     year:               document.getElementById('j-year').value,
     experience:         document.getElementById('j-experience').value,
