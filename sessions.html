@@ -123,7 +123,8 @@ function renderSessions() {
   grid.innerHTML = filtered.map(s => {
     const sessionDT = getSessionDateTime(s);
     const isPast = sessionDT < now;
-    const dateStr = new Date(s.date).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
+    const dateStr = new Date(s.date).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' })
+      + (s.endDate ? ` – ${new Date(s.endDate).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' })}` : '');
     const tags = (s.tags||[]).map(t => `<span class="tag">${t}</span>`).join('');
     const pct = Math.min(100, (s.registrationCount||0) / s.maxCapacity * 100);
     const fillClass = pct >= 90 ? 'danger' : pct >= 70 ? 'warning' : '';

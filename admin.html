@@ -176,15 +176,25 @@
           <input class="form-control" type="text" id="f-venue" placeholder="Room / Online / Lab">
         </div>
       </div>
+      <div class="form-group">
+        <label class="form-label" style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:400;">
+          <input type="checkbox" id="f-multiday" onchange="toggleMultiDay()" style="width:auto;">
+          This session runs across multiple dates
+        </label>
+      </div>
       <div class="form-row">
         <div class="form-group">
-          <label class="form-label">Date <span class="req">*</span></label>
-          <input class="form-control" type="date" id="f-date">
+          <label class="form-label" id="f-date-label">Date <span class="req">*</span></label>
+          <input class="form-control" type="date" id="f-date" onchange="syncEndDateMin()">
         </div>
         <div class="form-group">
           <label class="form-label">Time <span class="req">*</span></label>
           <input class="form-control" type="time" id="f-time">
         </div>
+      </div>
+      <div class="form-group" id="f-enddate-group" style="display:none;">
+        <label class="form-label">End Date <span class="req">*</span></label>
+        <input class="form-control" type="date" id="f-enddate">
       </div>
       <div class="form-row">
         <div class="form-group">
@@ -289,7 +299,7 @@ async function loadOverview() {
       <thead><tr><th>Title</th><th>Date</th><th>Speaker</th><th>Registrations</th><th>Status</th></tr></thead>
       <tbody>${sessions.slice(0,5).map(s => `<tr>
         <td><strong>${s.title}</strong></td>
-        <td>${new Date(s.date).toLocaleDateString('en-IN')}</td>
+        <td>${new Date(s.date).toLocaleDateString('en-IN')}${s.endDate ? ` – ${new Date(s.endDate).toLocaleDateString('en-IN')}` : ''}</td>
         <td>${s.speaker}</td>
         <td>${s.registrationCount} / ${s.maxCapacity}</td>
         <td><span class="badge ${s.isActive ? 'badge-active' : 'badge-inactive'}">${s.isActive ? 'Active' : 'Inactive'}</span></td>
@@ -327,7 +337,7 @@ async function loadSessionsTable() {
         const speaker  = s.speaker  || '—';
         const time     = s.time     || '—';
         const duration = s.duration != null ? s.duration : '—';
-        const date     = s.date ? new Date(s.date).toLocaleDateString('en-IN') : '—';
+        const date     = s.date ? new Date(s.date).toLocaleDateString('en-IN') + (s.endDate ? ` – ${new Date(s.endDate).toLocaleDateString('en-IN')}` : '') : '—';
         const tags     = (s.tags || []).join(', ') || '—';
         const regCount = s.registrationCount ?? 0;
         const maxCap   = s.maxCapacity ?? '—';
@@ -357,15 +367,35 @@ async function loadSessionsTable() {
 }
 
 // ── MODAL ──
+function toggleMultiDay() {
+  const isMulti = document.getElementById('f-multiday').checked;
+  const group = document.getElementById('f-enddate-group');
+  const label = document.getElementById('f-date-label');
+  group.style.display = isMulti ? 'block' : 'none';
+  label.innerHTML = isMulti ? 'Start Date <span class="req">*</span>' : 'Date <span class="req">*</span>';
+  if (isMulti) {
+    syncEndDateMin();
+  } else {
+    document.getElementById('f-enddate').value = '';
+  }
+}
+
+function syncEndDateMin() {
+  const startVal = document.getElementById('f-date').value;
+  if (startVal) document.getElementById('f-enddate').min = startVal;
+}
+
 function openCreateModal() {
   document.getElementById('modal-title').textContent = 'Create New Session';
   document.getElementById('modal-submit-btn').textContent = 'Create Session';
   document.getElementById('edit-id').value = '';
-  ['title','desc','speaker','venue','date','time','duration','meet','tags'].forEach(f => {
+  ['title','desc','speaker','venue','date','enddate','time','duration','meet','tags'].forEach(f => {
     const el = document.getElementById('f-'+f);
     if (el) el.value = '';
   });
   document.getElementById('f-capacity').value = '100';
+  document.getElementById('f-multiday').checked = false;
+  toggleMultiDay();
   document.getElementById('modal-alert').innerHTML = '';
   resetImageField();
   // Prevent selecting past dates
@@ -390,6 +420,14 @@ function openEditModal(s) {
   document.getElementById('f-tags').value        = (s.tags||[]).join(', ');
   document.getElementById('modal-alert').innerHTML = '';
   resetImageField();
+  if (s.endDate) {
+    document.getElementById('f-multiday').checked = true;
+    document.getElementById('f-enddate').value = new Date(s.endDate).toISOString().split('T')[0];
+  } else {
+    document.getElementById('f-multiday').checked = false;
+    document.getElementById('f-enddate').value = '';
+  }
+  toggleMultiDay();
   if (s.image) {
     currentImageBase64 = s.image;
     showImagePreview(s.image);
@@ -457,12 +495,16 @@ document.getElementById('session-modal').addEventListener('click', function(e) {
 
 async function submitSession() {
   const editId = document.getElementById('edit-id').value;
+  const isMulti = document.getElementById('f-multiday').checked;
   const body = {
     title:       document.getElementById('f-title').value.trim(),
     description: document.getElementById('f-desc').value.trim(),
     speaker:     document.getElementById('f-speaker').value.trim(),
     venue:       document.getElementById('f-venue').value.trim(),
     date:        document.getElementById('f-date').value,
+    // Non-empty when spanning multiple dates; sent as '' on edit so the
+    // backend can clear a previously multi-day session back to single-day.
+    endDate:     isMulti ? document.getElementById('f-enddate').value : '',
     time:        document.getElementById('f-time').value,
     duration:    parseInt(document.getElementById('f-duration').value),
     maxCapacity: parseInt(document.getElementById('f-capacity').value) || 100,
@@ -481,6 +523,17 @@ async function submitSession() {
   if (!body.title || !body.description || !body.speaker || !body.venue || !body.date || !body.time || !body.duration) {
     document.getElementById('modal-alert').innerHTML = `<div class="alert alert-error">⚠️ Please fill in all required fields.</div>`;
     return;
+  }
+
+  if (isMulti) {
+    if (!body.endDate) {
+      document.getElementById('modal-alert').innerHTML = `<div class="alert alert-error">⚠️ Please choose an end date for the multi-date session.</div>`;
+      return;
+    }
+    if (new Date(body.endDate) < new Date(body.date)) {
+      document.getElementById('modal-alert').innerHTML = `<div class="alert alert-error">⚠️ End date cannot be before the start date.</div>`;
+      return;
+    }
   }
 
   // Prevent past dates on create

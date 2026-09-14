@@ -84,7 +84,8 @@ async function init() {
       return;
     }
     grid.innerHTML = entries.map(({ session: s }) => {
-      const dateStr = new Date(s.date).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
+      const dateStr = new Date(s.date).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' })
+        + (s.endDate ? ` – ${new Date(s.endDate).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' })}` : '');
       const tags = (s.tags||[]).map(t => `<span class="tag">${t}</span>`).join('');
       return `
         <div class="session-card">
