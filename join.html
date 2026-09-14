@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Join Our Community — Google Ambassador Program</title>
+  <title>Join Our Community — Tech-o-nicks Program</title>
   <link rel="stylesheet" href="style.css">
+  <script src="config.js"></script>
   <style>
     .join-hero { background: linear-gradient(135deg, #1E7E34 0%, #34A853 100%); padding: 48px 24px 40px; text-align: center; }
     .join-hero h1 { font-family: 'Nunito', sans-serif; font-size: 2rem; font-weight: 800; color: white; margin-bottom: 10px; }
@@ -32,25 +33,29 @@
 
 <nav class="nav">
   <div class="nav-inner">
-    <a href="/" class="nav-logo">
+    <a href="index.html" class="nav-logo">
       <div class="nav-logo-dots">
         <span class="dot-b"></span><span class="dot-r"></span>
         <span class="dot-y"></span><span class="dot-g"></span>
       </div>
-      <span class="nav-logo-text"><span>Google</span> Ambassador</span>
+      <span class="nav-logo-text"><span>Tech-o-nicks</span></span>
     </a>
+    <button class="nav-toggle" onclick="this.classList.toggle('active'); this.closest('.nav-inner').querySelector('.nav-links').classList.toggle('open')" aria-label="Toggle menu">
+      <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+    </button>
     <div class="nav-links">
-      <a href="/" class="nav-link">Home</a>
-      <a href="/sessions" class="nav-link">Sessions</a>
-      <a href="/join" class="nav-link active">Join Community</a>
-      <a href="/admin" class="nav-link">Admin</a>
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="sessions.html" class="nav-link">Sessions</a>
+      <a href="join.html" class="nav-link active">Join Community</a>
+      <a href="login.html" class="nav-link">Login</a>
+      <a href="admin.html" class="nav-link">Admin</a>
     </div>
   </div>
 </nav>
 
 <div class="join-hero">
   <h1>🤝 Join Our Community</h1>
-  <p>Become a member of the Google Ambassador community. Stay updated on sessions, events, and opportunities.</p>
+  <p>Become a member of the Tech-o-nicks community. Stay updated on sessions, events, and opportunities.</p>
 </div>
 
 <div class="join-wrap">
@@ -79,28 +84,18 @@
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">College / Institution <span style="color:red">*</span></label>
-          <select class="form-control" id="j-college" onchange="toggleOther('j-college', 'j-college-other')">
-            <option value="">Select college</option>
-            <option>CoochBehar Government Engineering College</option>
-            <option value="Others">Others</option>
-          </select>
-          <input type="text" class="form-control" id="j-college-other" placeholder="Please specify your college name" style="display:none; margin-top:8px;">
+          <input type="text" class="form-control" id="j-college" placeholder="Your college name">
         </div>
         <div class="form-group">
           <label class="form-label">Branch / Department <span style="color:red">*</span></label>
-          <select class="form-control" id="j-branch" onchange="toggleOther('j-branch', 'j-branch-other')">
-            <option value="">Select department</option>
-            <option value="CSE">CSE</option>
-            <option value="ECE">ECE</option>
-            <option value="ME">ME</option>
-            <option value="CE">CE</option>
-            <option value="EE">EE</option>
-            <option value="Others">Others</option>
-          </select>
-          <input type="text" class="form-control" id="j-branch-other" placeholder="Please specify your department" style="display:none; margin-top:8px;">
+          <input type="text" class="form-control" id="j-branch" placeholder="e.g. Computer Science">
         </div>
       </div>
       <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Roll Number <span style="color:red">*</span></label>
+          <input type="text" class="form-control" id="j-roll" placeholder="e.g. 21CS1234">
+        </div>
         <div class="form-group">
           <label class="form-label">Year of Study <span style="color:red">*</span></label>
           <select class="form-control" id="j-year">
@@ -113,16 +108,29 @@
             <option>Other</option>
           </select>
         </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Experience Level <span style="color:red">*</span></label>
+        <select class="form-control" id="j-experience">
+          <option value="">Select level</option>
+          <option value="beginner">Beginner</option>
+          <option value="intermediate">Intermediate</option>
+          <option value="advanced">Advanced</option>
+        </select>
+      </div>
+
+      <div class="section-label">Account</div>
+      <div class="form-row">
         <div class="form-group">
-          <label class="form-label">Experience Level <span style="color:red">*</span></label>
-          <select class="form-control" id="j-experience">
-            <option value="">Select level</option>
-            <option value="beginner">Beginner</option>
-            <option value="intermediate">Intermediate</option>
-            <option value="advanced">Advanced</option>
-          </select>
+          <label class="form-label">Password <span style="color:red">*</span></label>
+          <input type="password" class="form-control" id="j-password" placeholder="At least 6 characters">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Confirm Password <span style="color:red">*</span></label>
+          <input type="password" class="form-control" id="j-password2" placeholder="Re-enter password">
         </div>
       </div>
+      <div class="form-hint" style="margin-top:-8px;margin-bottom:4px;">You'll use this email &amp; password to log in later and register for sessions in one click.</div>
 
       <div class="section-label">Interests</div>
       <div class="form-group">
@@ -132,10 +140,11 @@
           <div class="checkbox-pill"><input type="checkbox" id="i-ai" value="AI / ML"><label for="i-ai">🤖 AI / ML</label></div>
           <div class="checkbox-pill"><input type="checkbox" id="i-android" value="Android"><label for="i-android">📱 Android</label></div>
           <div class="checkbox-pill"><input type="checkbox" id="i-web" value="Web Dev"><label for="i-web">🌐 Web Dev</label></div>
-          <div class="checkbox-pill"><input type="checkbox" id="i-firebase" value="Firebase"><label for="i-firebase">🔥 Firebase</label></div>
-          <div class="checkbox-pill"><input type="checkbox" id="i-gemini" value="Gemini API"><label for="i-gemini">✨ Gemini API</label></div>
-          <div class="checkbox-pill"><input type="checkbox" id="i-devops" value="DevOps"><label for="i-devops">⚙️ DevOps</label></div>
+          <div class="checkbox-pill"><input type="checkbox" id="i-firebase" value="Firebase"><label for="i-firebase">🔥 Database</label></div>
+          <div class="checkbox-pill"><input type="checkbox" id="i-gemini" value="Gemini API"><label for="i-gemini">✨Arduino </label></div>
+          <div class="checkbox-pill"><input type="checkbox" id="i-devops" value="DevOps"><label for="i-devops">⚙️ Cybersecurity</label></div>
           <div class="checkbox-pill"><input type="checkbox" id="i-career" value="Career Growth"><label for="i-career">🚀 Career Growth</label></div>
+          <div class="checkbox-pill"><input type="checkbox" id="i-career" value="Career Growth"><label for="i-career">Others</label></div>
         </div>
       </div>
 
@@ -155,10 +164,11 @@
     <div id="success-area" class="success-box" style="display:none;">
       <div class="success-icon">🎉</div>
       <h2>Welcome to the Community!</h2>
-      <p>You've successfully joined the Google Ambassador community. We'll keep you posted on upcoming sessions and events.</p>
+      <p>You've successfully joined the Tech-o-nicks community. We'll keep you posted on upcoming sessions and events.</p>
       <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
-        <a href="/sessions" class="btn btn-primary">Browse Sessions</a>
-        <a href="/" class="btn btn-secondary">Back to Home</a>
+        <a href="sessions.html" class="btn btn-primary">Browse Sessions</a>
+        <a href="login.html" class="btn btn-secondary">Log In</a>
+        <a href="index.html" class="btn btn-secondary">Back to Home</a>
       </div>
     </div>
 
@@ -166,23 +176,10 @@
 </div>
 
 <footer>
-  <p>Google Ambassador Program — Built with ❤️ for students · <a href="/admin">Admin</a></p>
+  <p>Tech-o-nicks Program — Built By TeamX · </a></p>
 </footer>
 
 <script>
-function toggleOther(selectId, otherId) {
-  const select = document.getElementById(selectId);
-  const other = document.getElementById(otherId);
-  if (select.value === 'Others') {
-    other.style.display = 'block';
-    other.setAttribute('required', 'required');
-  } else {
-    other.style.display = 'none';
-    other.value = '';
-    other.removeAttribute('required');
-  }
-}
-
 async function submitJoin() {
   const btn = document.getElementById('join-btn');
   const alertBox = document.getElementById('join-alert');
@@ -190,26 +187,33 @@ async function submitJoin() {
 
   const interests = [...document.querySelectorAll('.checkbox-pill input:checked')].map(c => c.value);
 
-  const collegeSelect = document.getElementById('j-college').value;
-  const college = collegeSelect === 'Others' ? document.getElementById('j-college-other').value.trim() : collegeSelect;
-
-  const branchSelect = document.getElementById('j-branch').value;
-  const branch = branchSelect === 'Others' ? document.getElementById('j-branch-other').value.trim() : branchSelect;
+  const password  = document.getElementById('j-password').value;
+  const password2 = document.getElementById('j-password2').value;
 
   const body = {
     fullName:           document.getElementById('j-name').value.trim(),
     email:              document.getElementById('j-email').value.trim(),
     phone:              document.getElementById('j-phone').value.trim(),
-    college:            college,
-    branch:             branch,
+    college:            document.getElementById('j-college').value.trim(),
+    branch:             document.getElementById('j-branch').value.trim(),
+    rollNumber:         document.getElementById('j-roll').value.trim(),
     year:               document.getElementById('j-year').value,
     experience:         document.getElementById('j-experience').value,
+    password,
     interests,
     whyJoin:            document.getElementById('j-why').value.trim()
   };
 
-  if (!body.fullName || !body.email || !body.phone || !body.college || !body.branch || !body.year || !body.experience) {
+  if (!body.fullName || !body.email || !body.phone || !body.college || !body.branch || !body.rollNumber || !body.year || !body.experience) {
     alertBox.innerHTML = '<div class="alert alert-error">⚠️ Please fill in all required fields.</div>';
+    return;
+  }
+  if (!password || password.length < 6) {
+    alertBox.innerHTML = '<div class="alert alert-error">⚠️ Password must be at least 6 characters.</div>';
+    return;
+  }
+  if (password !== password2) {
+    alertBox.innerHTML = '<div class="alert alert-error">⚠️ Passwords do not match.</div>';
     return;
   }
 
@@ -217,7 +221,7 @@ async function submitJoin() {
   btn.textContent = 'Joining...';
 
   try {
-    const res = await fetch('https://google-ambassador-backend.onrender.com/api/community/join', {
+    const res = await fetch(`${API_BASE_URL}/api/community/join`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body)
